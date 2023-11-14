@@ -14,7 +14,7 @@ const colorList=<Color>[
 class AppTheme{
   final int selectedColor;
   AppTheme({
-    this.selectedColor=0 
+    this.selectedColor=1
       
     
   }
