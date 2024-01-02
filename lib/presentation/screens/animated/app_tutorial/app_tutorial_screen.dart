@@ -1,4 +1,6 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class SlideInfo {
   final String title;
@@ -27,24 +29,74 @@ final slides = <SlideInfo>[
       imageUrl: 'assets/images/3.png'),
 ];
 
-class AppTutorialScreen extends StatelessWidget {
+class AppTutorialScreen extends StatefulWidget {
   static const name = 'tutorial_screen';
 
   const AppTutorialScreen({super.key});
 
   @override
+  State<AppTutorialScreen> createState() => _AppTutorialScreenState();
+}
+
+class _AppTutorialScreenState extends State<AppTutorialScreen> {
+  final PageController PageviewController = PageController();
+  bool endReached=false;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    PageviewController.addListener(() {
+      final page=PageviewController.page??0;
+
+      if (!endReached&&page>=(slides.length-1.5)){
+        setState(() {
+          endReached=true;
+        });
+      }
+      print('${PageviewController.page}');
+    });
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: PageView(
-        physics: BouncingScrollPhysics(),
-        children: slides.map((slideData) =>
-            _Slide(
-              title: slideData.title, 
-              caption: slideData.caption, 
-              imageUrl: slideData.imageUrl
-              )
-              ).toList()
-              ,
+      backgroundColor: Colors.white,
+      body: Stack(
+        children: [
+          PageView(
+            controller: PageviewController,
+            physics: BouncingScrollPhysics(),
+            children: slides
+                .map((slideData) => _Slide(
+                    title: slideData.title,
+                    caption: slideData.caption,
+                    imageUrl: slideData.imageUrl))
+                .toList(),
+          ),
+          Positioned(
+           
+              right: 20,
+              top: 50,
+              child: TextButton(
+                  onPressed: () => context.pop(), child: Text('Salir'))),
+          endReached?Positioned(
+             bottom: 30,
+             right: 30,
+              child: FadeInRight(
+                from:15,
+                delay: Duration(seconds: 1),
+                child: FilledButton(
+                onPressed: () => context.pop(),
+                child: Text('Comenzar')),
+              )):const SizedBox(),
+        ],
       ),
     );
   }
@@ -62,21 +114,24 @@ class _Slide extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final titleStyle = Theme.of(context).textTheme.titleLarge;
+    final captionStyle = Theme.of(context).textTheme.bodySmall;
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 30),
       child: Center(
         child: Column(
-  mainAxisAlignment: MainAxisAlignment.center,
-  children: [
-    Image(image: AssetImage(imageUrl)),
-    SizedBox(height: 20), // Espacio entre la imagen y el texto
-    Text(title, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-    SizedBox(height: 10), // Espacio entre el título y el subtítulo
-    Text(caption),
-  ],
-),
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Image.asset(imageUrl),
 
+            SizedBox(height: 20), // Espacio entre la imagen y el texto
+            Text(title, style: titleStyle),
+            SizedBox(height: 10), // Espacio entre el título y el subtítulo
+            Text(caption, style: captionStyle),
+          ],
+        ),
       ),
-      );
+    );
   }
 }
