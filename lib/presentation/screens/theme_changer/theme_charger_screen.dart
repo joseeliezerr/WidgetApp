@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:widget_app/config/theme/app_theme.dart';
 import 'package:widget_app/presentation/providers/theme_provider.dart';
 
 class ThemeChangerScreen extends ConsumerWidget {
@@ -8,7 +9,7 @@ class ThemeChangerScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isDarkmode = ref.watch(isDarkmodeProvider);
+    final isDarkmode = ref.watch(themeNotifierProvider).isDarkmode;
     return Scaffold(
       appBar: AppBar(
         title: Text('Theme Changer'),
@@ -16,7 +17,8 @@ class ThemeChangerScreen extends ConsumerWidget {
           IconButton(
             onPressed: () {
               // Aquí cambias el estado del tema.
-              ref.read(isDarkmodeProvider.notifier).state = !isDarkmode;
+           //   ref.read(isDarkmodeProvider.notifier).state = !isDarkmode;
+           ref.read(themeNotifierProvider.notifier).toggleDarkmode();
             },
             icon: Icon(
               isDarkmode ? Icons.dark_mode_outlined : Icons.light_mode_outlined,
@@ -35,7 +37,9 @@ class _ThemeChangerView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, ref) {
     final List<Color> colors = ref.watch(colorListProvider);
-    final int Selectedcolors = ref.watch(selectedColorProvider);
+    final int selectedColor=ref.watch(themeNotifierProvider).selectedColor;
+    
+  //  final int Selectedcolors = ref.watch(selectedColorProvider);
    
 
     return ListView.builder(
@@ -47,9 +51,9 @@ class _ThemeChangerView extends ConsumerWidget {
             subtitle: Text('${color.value}'),
             activeColor: color,
             value: index,
-            groupValue: Selectedcolors,
+            groupValue: selectedColor,
             onChanged: (value) {
-              ref.read(selectedColorProvider.notifier).state = index;
+              ref.watch(themeNotifierProvider.notifier).changeColorIndex(index);
             });
       },
     );
